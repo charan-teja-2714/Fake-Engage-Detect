@@ -58,9 +58,11 @@ These were already updated in a previous session:
 | **Name** | `fakeengage-backend` |
 | **Root Directory** | *(leave blank)* |
 | **Runtime** | `Node` |
-| **Build Command** | `pip install -r backend/requirements.txt && cd backend && npm install` |
+| **Build Command** | `python3.11 -m pip install -r backend/requirements.txt && cd backend && npm install` |
 | **Start Command** | `node backend/src/server.js` |
 | **Instance Type** | Free |
+
+> ℹ️ Use `python3.11` explicitly — Render's default `python3` is 3.14 which has no scikit-learn wheel yet.
 
 5. Click **Advanced** → **Add Environment Variable** → add all of these:
 
@@ -71,6 +73,7 @@ FIREBASE_PROJECT_ID=fakeengagedetect
 FIREBASE_CLIENT_EMAIL=firebase-adminsdk-fbsvc@fakeengagedetect.iam.gserviceaccount.com
 FIREBASE_PRIVATE_KEY=-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n
 ML_TIMEOUT_MS=30000
+PYTHON_BIN=python3.11
 ```
 
 > ⚠️ `FIREBASE_PRIVATE_KEY` — paste exactly as it appears in your `.env` file (with `\n` as literal text, **not** line breaks).

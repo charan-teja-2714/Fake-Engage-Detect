@@ -1,0 +1,16 @@
+venv/
+MobileApp/
+dataset/raw/
+dataset/processed/final_dataset.csv
+.git/
+.claude/
+.env
+.env.*
+node_modules/
+__pycache__/
+*.py[cod]
+backend/node_modules/
+ml-module/saved_models/test_predictions.npz
+ml-module/saved_models/anomaly_scores.npz
+ml-module/evaluation_results/
+*.log
