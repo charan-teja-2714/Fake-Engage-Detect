@@ -2,9 +2,8 @@
 /.claude
 .claude
 
-# ── Mobile App (APK built locally, not needed on Render) ─────────────────────
-# /MobileApp
-# MobileApp
+# ── Mobile App ───────────────────────────────────────────────────────────────
+# Keep source code, ignore build outputs and dependencies
 
 # ── Secrets ───────────────────────────────────────────────────────────────────
 .env
@@ -34,16 +33,28 @@ dataset/processed/final_dataset.csv
 ml-module/saved_models/test_predictions.npz
 ml-module/saved_models/anomaly_scores.npz
 
-# ── Android build outputs ─────────────────────────────────────────────────────
+# ── Mobile App - React Native ────────────────────────────────────────────────
+MobileApp/node_modules/
+MobileApp/.expo/
+MobileApp/.expo-shared/
+
+# Android
 MobileApp/android/build/
 MobileApp/android/app/build/
 MobileApp/android/.gradle/
 MobileApp/android/local.properties
 MobileApp/android/release.keystore
+MobileApp/android/app/google-services.json
+MobileApp/android/.cxx/
 
-# ── iOS ───────────────────────────────────────────────────────────────────────
+# iOS
 MobileApp/ios/build/
 MobileApp/ios/Pods/
+MobileApp/ios/Podfile.lock
+MobileApp/ios/GoogleService-Info.plist
+
+# Metro
+MobileApp/.metro-health-check*
 
 # ── OS / editor ───────────────────────────────────────────────────────────────
 .DS_Store

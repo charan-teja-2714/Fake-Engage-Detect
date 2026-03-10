@@ -75,7 +75,7 @@ PYTHON_BIN=venv\Scripts\python.exe
 cd backend
 node src/server.js
 ```
-
+``
 You should see:
 ```
 ✅ MongoDB connected
@@ -108,7 +108,7 @@ cd MobileApp
 npm start          # starts Metro bundler (keep this running)
 # in a new terminal:
 npx react-native run-android
-```
+`````
 
 ---
 
