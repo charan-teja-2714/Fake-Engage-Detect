@@ -3,8 +3,8 @@
 .claude
 
 # ── Mobile App (APK built locally, not needed on Render) ─────────────────────
-/MobileApp
-MobileApp
+# /MobileApp
+# MobileApp
 
 # ── Secrets ───────────────────────────────────────────────────────────────────
 .env
