@@ -1,0 +1,10 @@
+providers = ["node"]
+
+[phases.setup]
+nixPkgs = ["nodejs_20", "python311", "python311Packages.pip"]
+
+[phases.install]
+cmds = ["cd backend && npm install", "pip install -r backend/requirements.txt"]
+
+[start]
+cmd = "cd backend && node src/server.js"

@@ -1,0 +1,47 @@
+{
+  "roc_auc": 0.6084105705273797,
+  "precision": 0.6063348416289592,
+  "recall": 0.024600697631723886,
+  "f1": 0.04728299223712067,
+  "confusion_matrix": {
+    "TP": 268,
+    "FP": 174,
+    "TN": 3300,
+    "FN": 10626
+  },
+  "genuine_score_mean": 0.6767434127401629,
+  "genuine_score_std": 0.3037797961724903,
+  "fake_score_mean": 0.7748360696041358,
+  "fake_score_std": 0.2654551100055185,
+  "norm_p5": 0.0416018388892176,
+  "norm_p95": 0.17489568620193618,
+  "if_params": {
+    "n_estimators": 200,
+    "max_samples": "auto",
+    "contamination": 0.05,
+    "max_features": 1.0,
+    "bootstrap": false,
+    "random_state": 42,
+    "n_jobs": -1
+  },
+  "feature_cols": [
+    "statuses_count",
+    "followers_count",
+    "friends_count",
+    "favourites_count",
+    "listed_count",
+    "verified",
+    "default_profile",
+    "default_profile_image",
+    "geo_enabled",
+    "account_age_days",
+    "follower_following_ratio",
+    "activity_rate",
+    "engagement_proxy",
+    "tweet_to_followers",
+    "has_url",
+    "has_description",
+    "name_length",
+    "digits_in_name"
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "validation": {
+    "accuracy": 0.9846867749419954,
+    "precision": 0.9932224276032039,
+    "recall": 0.9865361077111383,
+    "f1": 0.9898679766656432,
+    "roc_auc": 0.9957236695273426
+  },
+  "test": {
+    "accuracy": 0.9874768089053804,
+    "precision": 0.9932515337423313,
+    "recall": 0.9902140672782874,
+    "f1": 0.9917304747320062,
+    "roc_auc": 0.9986452775478819
+  },
+  "cv_f1_mean": 0.990743208164187,
+  "cv_f1_std": 0.0008594649536227591,
+  "oob_score": 0.9865765138709357,
+  "feature_cols": [
+    "statuses_count",
+    "followers_count",
+    "friends_count",
+    "favourites_count",
+    "listed_count",
+    "verified",
+    "default_profile",
+    "default_profile_image",
+    "geo_enabled",
+    "account_age_days",
+    "follower_following_ratio",
+    "activity_rate",
+    "engagement_proxy",
+    "tweet_to_followers",
+    "has_url",
+    "has_description",
+    "name_length",
+    "digits_in_name"
+  ]
+}

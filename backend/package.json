@@ -1,0 +1,22 @@
+{
+  "name": "creator-vendor-backend",
+  "version": "1.0.0",
+  "description": "Backend API for Creator-Vendor Collaboration App",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.6.1",
+    "express": "^4.19.2",
+    "firebase-admin": "^12.7.0",
+    "mongodb": "^7.1.0",
+    "mongoose": "^8.21.0",
+    "nodemailer": "^7.0.12"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}

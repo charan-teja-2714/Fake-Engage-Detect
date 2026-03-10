@@ -1,0 +1,57 @@
+# ── Claude Code ───────────────────────────────────────────────────────────────
+/.claude
+.claude
+
+# ── Mobile App (APK built locally, not needed on Render) ─────────────────────
+/MobileApp
+MobileApp
+
+# ── Secrets ───────────────────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── Python ────────────────────────────────────────────────────────────────────
+venv/
+__pycache__/
+*.py[cod]
+*.pyo
+.Python
+
+# ── Node.js ───────────────────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-error.log
+
+# ── Raw dataset (2.2 GB — never commit) ──────────────────────────────────────
+dataset/raw/
+
+# ── Processed dataset: keep features_dataset.csv (needed by predict.py)
+#    but ignore the large final_dataset.csv ────────────────────────────────────
+dataset/processed/final_dataset.csv
+
+# ── ML training artefacts (not needed at runtime) ────────────────────────────
+ml-module/saved_models/test_predictions.npz
+ml-module/saved_models/anomaly_scores.npz
+
+# ── Android build outputs ─────────────────────────────────────────────────────
+MobileApp/android/build/
+MobileApp/android/app/build/
+MobileApp/android/.gradle/
+MobileApp/android/local.properties
+MobileApp/android/release.keystore
+
+# ── iOS ───────────────────────────────────────────────────────────────────────
+MobileApp/ios/build/
+MobileApp/ios/Pods/
+
+# ── OS / editor ───────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.iml
+
+# ── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+logs/

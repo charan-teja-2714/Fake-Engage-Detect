@@ -1,0 +1,25 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Fake Engagement Detection — ML Module Dependencies
+# Python 3.10+
+# Install with: pip install -r requirements.txt
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Core data science
+pandas==2.2.2
+numpy==1.26.4
+
+# Machine learning
+scikit-learn==1.4.2
+
+# Model persistence
+joblib==1.4.2
+
+# Network analysis
+networkx==3.3
+
+# Visualisation
+matplotlib==3.9.0
+seaborn==0.13.2
+
+# Scientific utilities (used by sklearn internally, explicit pin for stability)
+scipy==1.13.1
