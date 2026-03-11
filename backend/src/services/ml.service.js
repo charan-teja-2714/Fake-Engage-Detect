@@ -137,6 +137,9 @@ function callPredictScript(payload) {
       clearTimeout(timer);
 
       if (code !== 0) {
+        console.error(`[mlService] Python process exited with code ${code}`);
+        console.error(`[mlService] Python stderr:`, stderr.trim());
+        console.error(`[mlService] Python stdout:`, stdout.trim());
         reject(
           new Error(`predict.py exited ${code}: ${stderr.trim() || "unknown error"}`)
         );
