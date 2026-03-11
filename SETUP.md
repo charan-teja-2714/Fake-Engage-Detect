@@ -54,7 +54,7 @@ PYTHON_BIN=python
 
 ```bash
 cd ..
-python -m venv venv
+py -3.12 -m venv venv
 venv\Scripts\activate
 pip install -r backend/requirements.txt
 ```

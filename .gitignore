@@ -34,27 +34,31 @@ ml-module/saved_models/test_predictions.npz
 ml-module/saved_models/anomaly_scores.npz
 
 # ── Mobile App - React Native ────────────────────────────────────────────────
-MobileApp/node_modules/
-MobileApp/.expo/
-MobileApp/.expo-shared/
+# Old MobileApp folder (deprecated)
+MobileApp/
+
+# MobileAppV2 (current version)
+MobileAppV2/node_modules/
+MobileAppV2/.expo/
+MobileAppV2/.expo-shared/
 
 # Android
-MobileApp/android/build/
-MobileApp/android/app/build/
-MobileApp/android/.gradle/
-MobileApp/android/local.properties
-MobileApp/android/release.keystore
-MobileApp/android/app/google-services.json
-MobileApp/android/.cxx/
+MobileAppV2/android/build/
+MobileAppV2/android/app/build/
+MobileAppV2/android/.gradle/
+MobileAppV2/android/local.properties
+MobileAppV2/android/release.keystore
+MobileAppV2/android/app/google-services.json
+MobileAppV2/android/.cxx/
 
 # iOS
-MobileApp/ios/build/
-MobileApp/ios/Pods/
-MobileApp/ios/Podfile.lock
-MobileApp/ios/GoogleService-Info.plist
+MobileAppV2/ios/build/
+MobileAppV2/ios/Pods/
+MobileAppV2/ios/Podfile.lock
+MobileAppV2/ios/GoogleService-Info.plist
 
 # Metro
-MobileApp/.metro-health-check*
+MobileAppV2/.metro-health-check*
 
 # ── OS / editor ───────────────────────────────────────────────────────────────
 .DS_Store

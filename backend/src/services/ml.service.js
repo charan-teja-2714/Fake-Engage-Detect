@@ -45,8 +45,8 @@ const PYTHON_BIN = process.env.PYTHON_BIN || "python3";
 // predict.py entry point
 const PREDICT_SCRIPT = path.join(PROJECT_ROOT, "ml-module", "api", "predict.py");
 
-// Timeout for the Python process (default 30 s — network graph can be slow)
-const ML_TIMEOUT_MS  = Number(process.env.ML_TIMEOUT_MS ?? 30_000);
+// Timeout for the Python process (default 60s for Render's slower environment)
+const ML_TIMEOUT_MS  = Number(process.env.ML_TIMEOUT_MS ?? 60_000);
 
 
 // ─────────────────────────────────────────────────────────────────────────────
