@@ -9,8 +9,8 @@ RUN apt-get update && apt-get install -y curl && \
 WORKDIR /app
 
 # Install Python ML dependencies first (cached layer)
-COPY backend/requirements.txt ./backend/requirements.txt
-RUN pip install --no-cache-dir -r backend/requirements.txt
+COPY requirements.txt ./requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Install Node dependencies (cached layer)
 COPY backend/package*.json ./backend/
