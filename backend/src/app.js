@@ -27,6 +27,16 @@ app.get("/api", (req, res) => {
   res.json({ message: "FakeEngageDetect API is running" });
 });
 
+app.get("/api/test-python", async (req, res) => {
+  const { spawn } = await import("child_process");
+  const proc = spawn("python3", ["-c", "print('Python works!')"]);
+  let output = "";
+  proc.stdout.on("data", (d) => { output += d.toString(); });
+  proc.on("close", (code) => {
+    res.json({ pythonWorks: code === 0, output, exitCode: code });
+  });
+});
+
 app.use("/api/creators", creatorRoutes);
 app.use("/api/vendors", vendorRoutes);
 app.use("/api/promotions", promotionRoutes);
