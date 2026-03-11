@@ -451,7 +451,8 @@ if __name__ == "__main__":
         raw_json   = sys.stdin.read().strip()
         raw_input  = json.loads(raw_json)
         result     = predict(raw_input)
-        print(json.dumps(result, indent=2))
+        print(json.dumps(result), flush=True)
+        print(json.dumps(error_response), file=sys.stderr, flush=True)
         sys.exit(0)
     except Exception as exc:
         error_response = {
