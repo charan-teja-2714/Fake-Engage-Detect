@@ -117,7 +117,7 @@ function buildMLPayload(creator) {
  */
 function callPredictScript(payload) {
   return new Promise((resolve, reject) => {
-    const proc = spawn(PYTHON_BIN, [PREDICT_SCRIPT], {
+    const proc = spawn(PYTHON_BIN, ["-u", PREDICT_SCRIPT], {
       cwd: PROJECT_ROOT,   // so relative imports inside predict.py resolve correctly
     });
 
