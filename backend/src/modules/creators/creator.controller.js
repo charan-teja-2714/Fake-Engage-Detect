@@ -123,7 +123,7 @@ export const getAllCreators = async (req, res, next) => {
  */
 export const getCreatorById = async (req, res, next) => {
   try {
-    const creator = await Creator.findById(req.params.id).select("-socialStats");
+    const creator = await Creator.findById(req.params.id);
 
     if (!creator) {
       return res.status(404).json({ success: false, message: "Creator not found" });

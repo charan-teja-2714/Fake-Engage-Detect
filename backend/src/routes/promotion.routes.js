@@ -4,6 +4,7 @@ import {
   getCreatorRequests,
   updatePromotionStatus,
   getVendorRequests,
+  editPromotionRequest,
 } from "../modules/promotions/promotion.controller.js";
 
 import firebaseAuth from "../middlewares/firebaseAuth.middleware.js";
@@ -43,6 +44,13 @@ router.get(
   firebaseAuth,
   authorizeRoles("vendor"),
   getVendorRequests
+);
+
+router.put(
+  "/edit",
+  firebaseAuth,
+  authorizeRoles("vendor"),
+  editPromotionRequest
 );
 
 

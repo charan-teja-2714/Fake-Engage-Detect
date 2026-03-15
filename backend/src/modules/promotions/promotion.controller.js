@@ -154,6 +154,38 @@ export const updatePromotionStatus = async (req, res, next) => {
   }
 };
 
+/**
+ * Vendor edits a pending promotion request (campaign title / message / budget)
+ */
+export const editPromotionRequest = async (req, res, next) => {
+  try {
+    const vendorUid = req.user.uid;
+    const { requestId, campaignTitle, message, proposedBudget } = req.body;
+
+    const vendor = await User.findOne({ uid: vendorUid });
+    if (!vendor) {
+      return res.status(404).json({ success: false, message: "Vendor not found" });
+    }
+
+    const request = await PromotionRequest.findOneAndUpdate(
+      { _id: requestId, vendor: vendor._id, status: "pending" },
+      { $set: { campaignTitle, message, proposedBudget } },
+      { new: true }
+    ).populate("creator", "name niche country pricePerPost platforms");
+
+    if (!request) {
+      return res.status(404).json({
+        success: false,
+        message: "Pending request not found or already responded to",
+      });
+    }
+
+    res.status(200).json({ success: true, message: "Proposal updated", data: request });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getVendorRequests = async (req, res, next) => {
   try {
     const vendorUid = req.user.uid;

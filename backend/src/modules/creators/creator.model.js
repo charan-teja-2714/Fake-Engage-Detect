@@ -39,6 +39,11 @@ const creatorSchema = new mongoose.Schema(
       min: 0,
     },
 
+    profileImageUrl: {
+      type: String,
+      default: null,
+    },
+
     platforms: {
       instagram: {
         username: String,
