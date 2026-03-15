@@ -31,8 +31,8 @@ export const sendPromotionRequest = async (req, res, next) => {
       contactEmail: vendor.email,
     });
 
-    // Send email to creator
-    await sendEmail({
+    // Send email to creator (non-blocking)
+    sendEmail({
       to: creator.email,
       subject: `New Promotion Request: ${campaignTitle}`,
       html: `
@@ -45,7 +45,7 @@ export const sendPromotionRequest = async (req, res, next) => {
         <br/>
         <p>Please login to your dashboard to respond.</p>
       `,
-    });
+    }).catch(err => console.error("Failed to send proposal email:", err.message));
 
     res.status(201).json({
       success: true,
@@ -125,23 +125,19 @@ export const updatePromotionStatus = async (req, res, next) => {
 
     // Notify vendor by email whenever creator accepts (including re-accepts)
     if (status === "accepted" && request.contactEmail) {
-      try {
-        const vendorName =
-          typeof request.vendor === "object" && request.vendor?.businessName
-            ? request.vendor.businessName
-            : "your brand";
-        await sendEmail({
-          to: request.contactEmail,
-          subject: `Your proposal "${request.campaignTitle}" was accepted!`,
-          html: `
-            <h3>Great news, ${vendorName}!</h3>
-            <p><strong>${creator.name}</strong> has accepted your collaboration proposal for <strong>${request.campaignTitle}</strong>.</p>
-            <p>Please login to your dashboard to proceed with the collaboration.</p>
-          `,
-        });
-      } catch (emailErr) {
-        console.error("Failed to send acceptance email:", emailErr.message);
-      }
+      const vendorName =
+        typeof request.vendor === "object" && request.vendor?.businessName
+          ? request.vendor.businessName
+          : "your brand";
+      sendEmail({
+        to: request.contactEmail,
+        subject: `Your proposal "${request.campaignTitle}" was accepted!`,
+        html: `
+          <h3>Great news, ${vendorName}!</h3>
+          <p><strong>${creator.name}</strong> has accepted your collaboration proposal for <strong>${request.campaignTitle}</strong>.</p>
+          <p>Please login to your dashboard to proceed with the collaboration.</p>
+        `,
+      }).catch(err => console.error("Failed to send acceptance email:", err.message));
     }
 
     res.status(200).json({
@@ -186,6 +182,38 @@ export const editPromotionRequest = async (req, res, next) => {
   }
 };
 
+/**
+ * Vendor deletes a pending proposal
+ */
+export const deletePromotionRequest = async (req, res, next) => {
+  try {
+    const vendorUid = req.user.uid;
+    const { requestId } = req.params;
+
+    const vendor = await User.findOne({ uid: vendorUid });
+    if (!vendor) {
+      return res.status(404).json({ success: false, message: "Vendor not found" });
+    }
+
+    const request = await PromotionRequest.findOneAndDelete({
+      _id: requestId,
+      vendor: vendor._id,
+      status: "pending",
+    });
+
+    if (!request) {
+      return res.status(404).json({
+        success: false,
+        message: "Pending proposal not found or already responded to",
+      });
+    }
+
+    res.status(200).json({ success: true, message: "Proposal deleted" });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getVendorRequests = async (req, res, next) => {
   try {
     const vendorUid = req.user.uid;
@@ -202,7 +230,7 @@ export const getVendorRequests = async (req, res, next) => {
     const requests = await PromotionRequest.find({
       vendor: vendor._id,
     })
-      .populate("creator", "name niche country pricePerPost platforms")
+      .populate("creator", "name niche country pricePerPost platforms profileImageUrl")
       .sort({ createdAt: -1 });
 
     res.status(200).json({

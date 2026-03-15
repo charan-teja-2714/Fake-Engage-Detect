@@ -5,6 +5,7 @@ import {
   updatePromotionStatus,
   getVendorRequests,
   editPromotionRequest,
+  deletePromotionRequest,
 } from "../modules/promotions/promotion.controller.js";
 
 import firebaseAuth from "../middlewares/firebaseAuth.middleware.js";
@@ -53,5 +54,11 @@ router.put(
   editPromotionRequest
 );
 
+router.delete(
+  "/:requestId",
+  firebaseAuth,
+  authorizeRoles("vendor"),
+  deletePromotionRequest
+);
 
 export default router;
