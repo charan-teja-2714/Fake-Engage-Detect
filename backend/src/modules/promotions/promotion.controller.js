@@ -114,13 +114,34 @@ export const updatePromotionStatus = async (req, res, next) => {
       { _id: requestId, creator: creator._id },
       { $set: { status } },
       { new: true }
-    );
+    ).populate("vendor", "businessName");
 
     if (!request) {
       return res.status(404).json({
         success: false,
         message: "Promotion request not found",
       });
+    }
+
+    // Notify vendor by email whenever creator accepts (including re-accepts)
+    if (status === "accepted" && request.contactEmail) {
+      try {
+        const vendorName =
+          typeof request.vendor === "object" && request.vendor?.businessName
+            ? request.vendor.businessName
+            : "your brand";
+        await sendEmail({
+          to: request.contactEmail,
+          subject: `Your proposal "${request.campaignTitle}" was accepted!`,
+          html: `
+            <h3>Great news, ${vendorName}!</h3>
+            <p><strong>${creator.name}</strong> has accepted your collaboration proposal for <strong>${request.campaignTitle}</strong>.</p>
+            <p>Please login to your dashboard to proceed with the collaboration.</p>
+          `,
+        });
+      } catch (emailErr) {
+        console.error("Failed to send acceptance email:", emailErr.message);
+      }
     }
 
     res.status(200).json({
@@ -149,7 +170,7 @@ export const getVendorRequests = async (req, res, next) => {
     const requests = await PromotionRequest.find({
       vendor: vendor._id,
     })
-      .populate("creator", "name niche country pricePerPost")
+      .populate("creator", "name niche country pricePerPost platforms")
       .sort({ createdAt: -1 });
 
     res.status(200).json({
