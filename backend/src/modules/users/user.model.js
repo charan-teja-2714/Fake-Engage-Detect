@@ -37,7 +37,11 @@ const userSchema = new mongoose.Schema(
     isActive: {
       type: Boolean,
       default: true
-    }
+    },
+
+    savedCreators: [
+      { type: mongoose.Schema.Types.ObjectId, ref: 'Creator' }
+    ],
   },
   { timestamps: true }
 );

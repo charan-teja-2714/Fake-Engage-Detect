@@ -1,4 +1,5 @@
 import Creator from "../creators/creator.model.js";
+import User from "../users/user.model.js";
 
 /**
  * Search creators (keyword + filters + pagination)
@@ -86,20 +87,57 @@ export const viewCreatorProfile = async (req, res, next) => {
 };
 
 /**
- * Save viewed creator (optional feature)
+ * Toggle save/unsave creator
  */
 export const saveCreator = async (req, res, next) => {
   try {
     const { uid } = req.user;
     const { creatorId } = req.body;
 
-    // Optional: store in vendor document or separate collection
-    // For now, just simulate success
+    const vendor = await User.findOne({ uid });
+    if (!vendor) {
+      return res.status(404).json({ success: false, message: "Vendor not found" });
+    }
+
+    const alreadySaved = vendor.savedCreators.some(
+      (id) => id.toString() === creatorId
+    );
+
+    if (alreadySaved) {
+      vendor.savedCreators = vendor.savedCreators.filter(
+        (id) => id.toString() !== creatorId
+      );
+      await vendor.save();
+      return res.status(200).json({ success: true, saved: false, message: "Creator removed from saved list" });
+    } else {
+      vendor.savedCreators.push(creatorId);
+      await vendor.save();
+      return res.status(200).json({ success: true, saved: true, message: "Creator saved successfully" });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Get saved creators list
+ */
+export const getSavedCreators = async (req, res, next) => {
+  try {
+    const { uid } = req.user;
+
+    const vendor = await User.findOne({ uid }).populate({
+      path: "savedCreators",
+      select: "-email",
+    });
+
+    if (!vendor) {
+      return res.status(404).json({ success: false, message: "Vendor not found" });
+    }
 
     res.status(200).json({
       success: true,
-      message: "Creator saved successfully",
-      creatorId,
+      data: vendor.savedCreators,
     });
   } catch (error) {
     next(error);

@@ -30,10 +30,16 @@
 8. [Bugs Fixed](#8-bugs-fixed)
 9. [Current Test Results](#9-current-test-results)
 10. [Known Limitations](#10-known-limitations)
-11. [Phase 3 — Mobile App (Upcoming)](#11-phase-3--mobile-app-upcoming)
+11. [Phase 3 — Mobile App (Complete)](#11-phase-3--mobile-app-complete)
+    - [Tech Stack](#111-tech-stack)
+    - [Navigation Structure](#112-navigation-structure)
+    - [Screens Implemented](#113-screens-implemented)
+    - [API Layer](#114-api-layer)
+    - [Vendor Module](#115-vendor-module)
+    - [Promotions / Deals Module](#116-promotions--deals-module)
+    - [API Configuration](#117-api-configuration)
 
 ---
-
 ## 1. Project Overview
 
 **Name:** Fake Engagement Detection & Authenticity Scoring System
@@ -119,13 +125,42 @@ FakeEngagementApp/
 │       │   ├── firebaseAuth.middleware.js
 │       │   └── role.middleware.js
 │       ├── modules/
-│       │   └── creators/
-│       │       ├── creator.model.js      # Mongoose schema
-│       │       └── creator.controller.js # Route handlers
+│       │   ├── creators/
+│       │   │   ├── creator.model.js
+│       │   │   └── creator.controller.js
+│       │   ├── users/
+│       │   │   ├── user.model.js         # Vendor account schema
+│       │   │   └── users.controller.js   # registerVendor handler
+│       │   ├── vendors/
+│       │   │   └── vendor.controller.js  # Search, save, view creators
+│       │   └── promotions/
+│       │       ├── promotionRequest.model.js
+│       │       └── promotion.controller.js
 │       ├── routes/
-│       │   └── creator.routes.js         # Express routes
+│       │   ├── auth.routes.js            # GET /api/auth/me
+│       │   ├── creator.routes.js
+│       │   ├── user.routes.js            # POST /api/users/register
+│       │   ├── vendor.routes.js          # Vendor-scoped creator routes
+│       │   └── promotion.routes.js       # Deal proposal routes
 │       └── services/
 │           └── ml.service.js             # Node.js ↔ Python bridge
+│
+├── MobileAppV2/                      # Phase 3 — React Native (Expo)
+│   └── src/
+│       ├── api/
+│       │   ├── config.ts             # BASE_URL, FIREBASE_API_KEY
+│       │   ├── auth.api.ts
+│       │   ├── creator.api.ts
+│       │   ├── vendor.api.ts
+│       │   ├── promotion.api.ts
+│       │   └── upload.ts
+│       ├── navigation/               # React Navigation stack + tabs
+│       ├── screens/
+│       │   ├── auth/                 # Login, Register, RoleSelect
+│       │   ├── creator/              # Dashboard, Registration, EditProfile, Deals
+│       │   └── vendor/               # Registration, Browse, SavedCreators,
+│       │                             # CreatorDetail, SendProposal, VendorDeals
+│       └── context/                  # Auth + user context
 │
 └── details.md                        # This file
 ```
@@ -157,6 +192,17 @@ FakeEngagementApp/
 | Firebase Admin SDK | JWT token verification |
 | child_process.spawn | Spawning Python subprocess |
 | ES Modules | `"type": "module"` — uses `import`/`export` syntax |
+
+### Mobile App (React Native)
+
+| Technology | Purpose |
+|---|---|
+| React Native (Expo) | Cross-platform mobile framework |
+| React Navigation | Stack + bottom-tab navigation |
+| Axios | HTTP calls to Node.js backend |
+| Firebase Auth (REST) | Email/password login and signup |
+| AsyncStorage | Token and session persistence |
+| TypeScript | Type-safe API and screen code |
 
 ---
 
@@ -202,10 +248,6 @@ FakeEngagementApp/
 ```bash
 python ml-module/data_preprocessing/merge_datasets.py
 ```
- netsh advfirewall firewall add rule name="NodeJS-5000" dir=in action=allow protocol=TCP localport=5000
-
-
- ipconfig
 
 ---
 
@@ -631,7 +673,7 @@ mlDetails: {
 
 ### 5.5 Routes
 
-**File:** `backend/src/routes/creator.routes.js`
+**Creator routes** — `backend/src/routes/creator.routes.js`
 
 ```javascript
 // Public
@@ -644,7 +686,43 @@ POST   /api/creators              → createCreatorProfile
 PUT    /api/creators              → updateCreatorProfile
 ```
 
-**Important:** `/:id/score` must be registered **before** `/:id` in Express. If registered after, Express matches `/score` as an ID value and calls `getCreatorById` instead.
+**User routes** — `backend/src/routes/user.routes.js`
+
+```javascript
+// Vendor registration (firebaseAuth)
+POST   /api/users/register        → registerVendor
+```
+
+**Auth routes** — `backend/src/routes/auth.routes.js`
+
+```javascript
+// Any authenticated user
+GET    /api/auth/me               → fetchMe   ← returns role + profileId
+```
+
+**Vendor routes** — `backend/src/routes/vendor.routes.js`
+
+```javascript
+// Vendor only (firebaseAuth + authorizeRoles("vendor"))
+GET    /api/vendors/creators          → searchCreators (filterable)
+GET    /api/vendors/creators/saved    → getSavedCreators   ← must be BEFORE /:id
+GET    /api/vendors/creators/:id      → getCreatorProfileAsVendor
+POST   /api/vendors/creators/save     → saveCreator (toggle bookmark)
+```
+
+**Promotion routes** — `backend/src/routes/promotion.routes.js`
+
+```javascript
+// Vendor only
+POST   /api/promotions             → sendProposal
+GET    /api/promotions/vendor      → getVendorProposals
+PUT    /api/promotions/edit        → editProposal
+DELETE /api/promotions/:requestId  → deleteProposal
+
+// Creator only
+GET    /api/promotions/creator     → getCreatorProposals
+PUT    /api/promotions/status      → updateProposalStatus (accept/reject)
+```
 
 ---
 
@@ -918,45 +996,187 @@ The Cresci-2017 dataset is from 2015. Social media bot behaviour has evolved sig
 
 ---
 
-## 11. Phase 3 — Mobile App (Upcoming)
+## 11. Phase 3 — Mobile App (Complete)
 
-### Tech stack
-- **React Native** (Expo or bare)
-- **React Navigation** (stack + tab navigators)
-- **Axios** — HTTP calls to Node.js backend
-- **Firebase Auth SDK** — login/signup on the client side
-- **AsyncStorage** — token and session persistence
+### 11.1 Tech Stack
 
-### Planned screens
-
-#### Auth flow (shared)
-1. **Splash / Onboarding** — app intro
-2. **Login** — email/password via Firebase
-3. **Register** — email/password + role selection (Creator / Vendor)
-
-#### Creator flow
-4. **Creator Registration** — profile form including `socialStats`:
-   - Name, niche, country, price per post
-   - Platform details (Instagram username, YouTube channel)
-   - Social stats: totalFollowers, totalFollowing, totalPosts, totalLikes, accountCreatedAt, isVerified, hasProfileImage, hasDescription, hasUrl, screenName
-5. **Creator Dashboard** — authenticity score card, tier badge, score breakdown chart
-6. **Creator Profile** — view/edit profile, trigger score refresh
-
-#### Vendor flow
-7. **Creator Browse** — paginated/filterable list of creators (filter by niche, country, price, min score)
-8. **Creator Detail** — full profile + authenticity score breakdown (bot probability, anomaly score, network score)
-9. **Deal Management** — send/accept/reject collaboration proposals
-
-### API endpoints the app will consume
-
-| Method | Endpoint | Who uses it |
-|---|---|---|
-| POST | `/api/creators` | Creator — register profile |
-| PUT | `/api/creators` | Creator — update profile |
-| GET | `/api/creators` | Vendor — browse list |
-| GET | `/api/creators/:id` | Vendor — view profile |
-| GET | `/api/creators/:id/score` | Vendor — view ML score breakdown |
+| Technology | Purpose |
+|---|---|
+| React Native (Expo) | Cross-platform iOS/Android app |
+| TypeScript | Type-safe code throughout |
+| React Navigation | Stack + bottom-tab navigators |
+| Axios | HTTP calls to Node.js backend |
+| Firebase Auth (REST) | Email/password login and signup via Firebase REST API |
+| AsyncStorage | Token and session persistence across app restarts |
 
 ---
 
-*Last updated: Phase 2 complete. All ML integration tests passing. Ready for Phase 3.*
+### 11.2 Navigation Structure
+
+```
+RootNavigator
+├── AuthNavigator
+│   ├── LoginScreen
+│   ├── RegisterScreen
+│   └── RoleSelectScreen
+├── SetupNavigator (profile creation after first login)
+│   ├── CreatorRegistrationScreen
+│   └── VendorRegistrationScreen
+├── CreatorAppNavigator (bottom tabs)
+│   ├── Dashboard tab    → CreatorDashboardScreen
+│   └── Deals tab        → CreatorDealsScreen
+│       └── EditProfile (modal)
+└── VendorNavigator (bottom tabs)
+    ├── Browse tab        → BrowseCreatorsScreen
+    │   ├── CreatorDetail (modal)
+    │   └── SendProposal (modal)
+    ├── Saved tab         → SavedCreatorsScreen
+    └── Deals tab         → VendorDealsScreen
+```
+
+---
+
+### 11.3 Screens Implemented
+
+#### Auth Flow (shared)
+| Screen | Description |
+|---|---|
+| `LoginScreen` | Email/password login via Firebase REST API |
+| `RegisterScreen` | Email/password registration + role selection (Creator / Vendor) |
+| `RoleSelectScreen` | Choose role when user has multiple profiles |
+
+#### Creator Flow
+| Screen | Description |
+|---|---|
+| `CreatorRegistrationScreen` | Profile setup: name, niche, country, price per post, social stats (followers, following, posts, likes, account age, verified, screen name, etc.) |
+| `CreatorDashboardScreen` | Authenticity score card with tier badge, bot probability, anomaly score, network score breakdown |
+| `EditProfileScreen` | Update profile fields; re-triggers ML scoring when `socialStats` changes |
+| `CreatorDealsScreen` | Incoming collaboration proposals from vendors — accept or reject |
+
+#### Vendor Flow
+| Screen | Description |
+|---|---|
+| `VendorRegistrationScreen` | Brand/business setup: business name, industry, country |
+| `BrowseCreatorsScreen` | Paginated creator list with filters: niche, country, min/max price, minimum authenticity score |
+| `CreatorDetailScreen` | Full creator profile with ML score breakdown (bot probability, anomaly score, network score, risk tier) |
+| `SendProposalScreen` | Compose and send campaign proposal: title, message, budget, contact email |
+| `VendorDealsScreen` | Track all sent proposals with status (pending / accepted / rejected); edit or delete pending proposals |
+| `SavedCreatorsScreen` | Bookmarked creators list for quick access |
+
+---
+
+### 11.4 API Layer
+
+**File:** `MobileAppV2/src/api/config.ts`
+
+```typescript
+export const API_BASE_URL = 'https://fake-engage-detect-1.onrender.com';
+export const BASE_URL = `${API_BASE_URL}/api`;
+
+// Local development (same Wi-Fi only):
+// export const API_BASE_URL = 'http://<YOUR_MACHINE_IP>:5000';
+```
+
+All API files import `BASE_URL` from `config.ts`. To run locally, uncomment the local line and replace `<YOUR_MACHINE_IP>` with the result of `ipconfig` (IPv4 Address under Wi-Fi adapter). The device/emulator must be on the same Wi-Fi network as the backend machine.
+
+| API File | Endpoints called |
+|---|---|
+| `auth.api.ts` | Firebase signup/login, `GET /api/auth/me` |
+| `creator.api.ts` | `POST/PUT /api/creators`, `GET /api/creators`, `GET /api/creators/:id`, `GET /api/creators/:id/score` |
+| `vendor.api.ts` | `POST /api/users/register`, `GET /api/vendors/creators`, `GET /api/vendors/creators/:id`, `POST /api/vendors/creators/save` |
+| `promotion.api.ts` | `POST /api/promotions`, `GET /api/promotions/vendor`, `GET /api/promotions/creator`, `PUT /api/promotions/status`, `PUT /api/promotions/edit`, `DELETE /api/promotions/:id` |
+
+---
+
+### 11.5 Vendor Module
+
+**User/Vendor Model** — `backend/src/modules/users/user.model.js`
+
+```javascript
+{
+  uid:            String (unique),   // Firebase UID
+  email:          String (unique),
+  role:           "vendor",
+  businessName:   String,
+  industry:       String,
+  country:        String,
+  isActive:       Boolean (default: true),
+  savedCreators:  [ObjectId → Creator],  // bookmarked creators
+  createdAt / updatedAt: timestamps
+}
+```
+
+**Registration flow:**
+1. Mobile calls `POST /api/users/register` with Firebase token + `{ businessName, industry, country }`
+2. `firebaseAuth` middleware verifies token → injects `req.user = { uid, email }`
+3. `registerVendor` controller checks for duplicate UID, creates User document
+4. Returns `201` with vendor profile
+
+**Vendor controller** — `backend/src/modules/vendors/vendor.controller.js`
+
+| Function | Route | Description |
+|---|---|---|
+| `searchCreators` | `GET /api/vendors/creators` | Filtered/paginated creator list (niche, country, price, min score) |
+| `getSavedCreators` | `GET /api/vendors/creators/saved` | Returns vendor's bookmarked creator list |
+| `getCreatorProfileAsVendor` | `GET /api/vendors/creators/:id` | Full creator profile visible to vendor |
+| `saveCreator` | `POST /api/vendors/creators/save` | Toggle bookmark (save/unsave) |
+
+---
+
+### 11.6 Promotions / Deals Module
+
+**Promotion Request Model** — `backend/src/modules/promotions/promotionRequest.model.js`
+
+```javascript
+{
+  vendor:         ObjectId → User,
+  creator:        ObjectId → Creator,
+  campaignTitle:  String,
+  message:        String,
+  proposedBudget: Number,
+  contactEmail:   String,
+  status:         "pending" | "accepted" | "rejected" (default: "pending"),
+  createdAt / updatedAt: timestamps
+}
+```
+
+**Full deal workflow:**
+
+```
+Vendor browsing → sendProposal → status: "pending"
+                                        ↓
+                           Creator sees in Deals tab
+                                        ↓
+                     Creator accepts → status: "accepted"
+                     Creator rejects → status: "rejected"
+                                        ↓
+                 Vendor sees updated status in VendorDeals tab
+                 Vendor can edit/delete while status = "pending"
+```
+
+**Promotion controller** — `backend/src/modules/promotions/promotion.controller.js`
+
+| Function | Route | Role | Description |
+|---|---|---|---|
+| `sendProposal` | `POST /api/promotions` | Vendor | Create new proposal |
+| `getVendorProposals` | `GET /api/promotions/vendor` | Vendor | All proposals sent by this vendor |
+| `editProposal` | `PUT /api/promotions/edit` | Vendor | Edit a pending proposal |
+| `deleteProposal` | `DELETE /api/promotions/:id` | Vendor | Delete a proposal |
+| `getCreatorProposals` | `GET /api/promotions/creator` | Creator | All proposals received by this creator |
+| `updateProposalStatus` | `PUT /api/promotions/status` | Creator | Accept or reject a proposal |
+
+---
+
+### 11.7 API Configuration
+
+**Bug fixed:** `config.ts` exported `API_BASE_URL` but all API files imported `BASE_URL` (which was commented out), making `BASE_URL` resolve to `undefined` and causing network errors on all API calls including vendor registration.
+
+**Fix applied:**
+```typescript
+export const API_BASE_URL = 'https://fake-engage-detect-1.onrender.com';
+export const BASE_URL = `${API_BASE_URL}/api`;  // ← added, derived from API_BASE_URL
+```
+
+---
+
+*Last updated: Phase 3 complete. Mobile app fully implemented with Auth, Creator, Vendor, and Promotions modules.*

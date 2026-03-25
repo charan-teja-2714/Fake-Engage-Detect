@@ -3,6 +3,7 @@ import {
   searchCreators,
   viewCreatorProfile,
   saveCreator,
+  getSavedCreators,
 } from "../modules/vendors/vendor.controller.js";
 
 import firebaseAuth from "../middlewares/firebaseAuth.middleware.js";
@@ -18,6 +19,14 @@ router.get(
   firebaseAuth,
   authorizeRoles("vendor"),
   searchCreators
+);
+
+// Must be before /creators/:id so it doesn't get caught as an ID
+router.get(
+  "/creators/saved",
+  firebaseAuth,
+  authorizeRoles("vendor"),
+  getSavedCreators
 );
 
 router.get(
